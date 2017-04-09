@@ -29,7 +29,7 @@ class BusinessTableViewCell: UITableViewCell {
             distanceLabel.text = business.distance
             reviewsLabel.text = "\(business.reviewCount!) reviews"
             addressLabel.text = business.address
-            categoriesLabel.text = business.categories
+            //categoriesLabel.text = business.categories != nil ? business.categories : ""
         }
     }
     
