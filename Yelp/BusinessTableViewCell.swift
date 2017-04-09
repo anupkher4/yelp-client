@@ -19,7 +19,9 @@ class BusinessTableViewCell: UITableViewCell {
 
     var business: Business! {
         didSet {
-            posterImageView.setImageWith(business.imageURL!)
+            if let posterUrl = business.imageURL {
+                posterImageView.setImageWith(posterUrl)
+            }
             posterImageView.layer.cornerRadius = posterImageView.frame.size.width / 20
             posterImageView.clipsToBounds = true
             ratingsImageView.setImageWith(business.ratingImageURL!)

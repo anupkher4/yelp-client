@@ -16,6 +16,22 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Navigation Bar setup
+        let yelpRed = UIColor(red: 196/255.0, green: 18/255.0, blue: 0, alpha: 1.0)
+        navigationController?.navigationBar.barTintColor = yelpRed
+        
+        let searchBar = UISearchBar()
+        searchBar.placeholder = "Restaurants"
+        searchBar.tintColor = UIColor.white
+        searchBar.sizeToFit()
+        searchBar.delegate = self
+        navigationItem.titleView = searchBar
+        
+        let filterButton = UIBarButtonItem(title: "Filter", style: .plain, target: self, action: nil)
+        filterButton.tintColor = UIColor.white
+        navigationItem.leftBarButtonItem = filterButton
+        
+        // Table View setup
         businessTableView.delegate = self
         businessTableView.dataSource = self
         businessTableView.rowHeight = UITableViewAutomaticDimension
@@ -53,6 +69,10 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
         // Dispose of any resources that can be recreated.
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if let businesses = self.businesses {
             return businesses.count
@@ -78,5 +98,29 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
      // Pass the selected object to the new view controller.
      }
      */
+    
+}
+
+extension BusinessesViewController: UISearchBarDelegate {
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        Business.searchWithTerm(term: searchText) {
+            (businesses, error) in
+            self.businesses = businesses
+            self.businessTableView.reloadData()
+        }
+        
+    }
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        searchBar.showsCancelButton = true
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.showsCancelButton = false
+        searchBar.text = ""
+        searchBar.resignFirstResponder()
+    }
     
 }
