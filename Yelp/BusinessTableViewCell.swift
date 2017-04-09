@@ -20,9 +20,12 @@ class BusinessTableViewCell: UITableViewCell {
     var business: Business! {
         didSet {
             posterImageView.setImageWith(business.imageURL!)
+            posterImageView.layer.cornerRadius = posterImageView.frame.size.width / 20
+            posterImageView.clipsToBounds = true
+            ratingsImageView.setImageWith(business.ratingImageURL!)
             nameLabel.text = business.name
             distanceLabel.text = business.distance
-            reviewsLabel.text = "\(business.reviewCount!)"
+            reviewsLabel.text = "\(business.reviewCount!) reviews"
             addressLabel.text = business.address
             categoriesLabel.text = business.categories
         }
@@ -30,7 +33,6 @@ class BusinessTableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
