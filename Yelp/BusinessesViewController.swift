@@ -13,6 +13,11 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
     
     var businesses: [Business]!
     
+    var isMoreDataLoading = false
+    var loadingMoreView: InfiniteScrollActivityView?
+    
+    var currentSearchText = "Thai"
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -37,7 +42,16 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
         businessTableView.rowHeight = UITableViewAutomaticDimension
         businessTableView.estimatedRowHeight = 120
         
-        Business.searchWithTerm(term: "Thai", completion: { (businesses: [Business]?, error: Error?) -> Void in
+        let frame = CGRect(x: 0, y: businessTableView.contentSize.height, width: businessTableView.bounds.size.width, height: InfiniteScrollActivityView.defaultHeight)
+        loadingMoreView = InfiniteScrollActivityView(frame: frame)
+        loadingMoreView!.isHidden = true
+        businessTableView.addSubview(loadingMoreView!)
+        
+        var insets = businessTableView.contentInset
+        insets.bottom += InfiniteScrollActivityView.defaultHeight
+        businessTableView.contentInset = insets
+        
+        Business.searchWithTerm(term: currentSearchText, completion: { (businesses: [Business]?, error: Error?) -> Void in
             
             self.businesses = businesses
             self.businessTableView.reloadData()
@@ -103,14 +117,18 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
 
 extension BusinessesViewController: UISearchBarDelegate {
     
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        currentSearchText = searchBar.text!
         
-        Business.searchWithTerm(term: searchText) {
-            (businesses, error) in
+        Business.searchWithTerm(term: currentSearchText) {
+            (businesses: [Business]?, error: Error?) in
             self.businesses = businesses
             self.businessTableView.reloadData()
         }
         
+        searchBar.showsCancelButton = false
+        searchBar.text = ""
+        searchBar.resignFirstResponder()
     }
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
@@ -121,6 +139,37 @@ extension BusinessesViewController: UISearchBarDelegate {
         searchBar.showsCancelButton = false
         searchBar.text = ""
         searchBar.resignFirstResponder()
+    }
+    
+}
+
+extension BusinessesViewController: UIScrollViewDelegate {
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        
+        if !isMoreDataLoading {
+            let scrollViewContentHeight = businessTableView.contentSize.height
+            let scrollViewContentThreshold = scrollViewContentHeight - businessTableView.bounds.size.height
+            
+            if scrollView.contentOffset.y > scrollViewContentThreshold && businessTableView.isDragging {
+                isMoreDataLoading = true
+                loadingMoreView!.startAnimating()
+                loadMoreData()
+            }
+        }
+        
+    }
+    
+    func loadMoreData() {
+        
+        Business.searchWithTerm(term: currentSearchText, offset: businesses.count) {
+            (businesses: [Business]?, error: Error?) in
+            self.loadingMoreView!.stopAnimating()
+            self.isMoreDataLoading = false
+            self.businesses.append(contentsOf: businesses as [Business]!)
+            self.businessTableView.reloadData()
+        }
+        
     }
     
 }
