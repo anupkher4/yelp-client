@@ -21,8 +21,11 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Bys-45-lVe">
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                            </mapView>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="120" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="skq-sP-jN5">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="BusinessCell" rowHeight="120" id="ME9-Q9-cVg" customClass="BusinessTableViewCell" customModule="Yelp" customModuleProvider="target">
@@ -116,15 +119,20 @@
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstItem="Bys-45-lVe" firstAttribute="top" secondItem="hR0-74-jRp" secondAttribute="bottom" id="48P-sw-mCm"/>
                             <constraint firstItem="skq-sP-jN5" firstAttribute="leading" secondItem="XhR-oz-92f" secondAttribute="leading" id="6nx-xZ-ScE"/>
-                            <constraint firstItem="skq-sP-jN5" firstAttribute="top" secondItem="XhR-oz-92f" secondAttribute="top" id="VVq-xY-cNe"/>
+                            <constraint firstItem="Bys-45-lVe" firstAttribute="leading" secondItem="XhR-oz-92f" secondAttribute="leading" id="IKa-bc-HWy"/>
+                            <constraint firstItem="skq-sP-jN5" firstAttribute="top" secondItem="XhR-oz-92f" secondAttribute="top" constant="64" id="VVq-xY-cNe"/>
+                            <constraint firstAttribute="trailing" secondItem="Bys-45-lVe" secondAttribute="trailing" id="a2s-uj-fNw"/>
                             <constraint firstItem="VBY-gq-v8E" firstAttribute="top" secondItem="skq-sP-jN5" secondAttribute="bottom" id="dhL-cw-k2d"/>
+                            <constraint firstItem="VBY-gq-v8E" firstAttribute="top" secondItem="Bys-45-lVe" secondAttribute="bottom" id="jSI-Jb-MRb"/>
                             <constraint firstAttribute="trailing" secondItem="skq-sP-jN5" secondAttribute="trailing" id="pp4-Zj-agy"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="CV5-or-x09"/>
                     <connections>
                         <outlet property="businessTableView" destination="skq-sP-jN5" id="fJ7-XZ-TZV"/>
+                        <outlet property="mapView" destination="Bys-45-lVe" id="G18-Vy-zkd"/>
                         <segue destination="MJw-nG-NPC" kind="presentation" identifier="businessToFilter" id="lBE-zP-ATc"/>
                     </connections>
                 </viewController>
@@ -211,13 +219,14 @@
                                     <constraint firstAttribute="height" constant="150" id="uzk-Bb-TNj"/>
                                 </constraints>
                             </view>
-                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Udb-42-vmg">
-                                <rect key="frame" x="0.0" y="222" width="375" height="378"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Udb-42-vmg">
+                                <rect key="frame" x="0.0" y="256" width="375" height="200"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="200" id="26C-vd-gea"/>
+                                </constraints>
                             </mapView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kdP-F7-mqC">
-                                <rect key="frame" x="9" y="608" width="359" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kdP-F7-mqC">
+                                <rect key="frame" x="8" y="464" width="359" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -226,10 +235,16 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="3cE-Zv-uOJ" firstAttribute="leading" secondItem="5X4-CX-j08" secondAttribute="leading" id="19F-uv-Or8"/>
+                            <constraint firstItem="Udb-42-vmg" firstAttribute="top" secondItem="tqw-yw-aMi" secondAttribute="bottom" constant="42" id="KEl-uX-mHe"/>
+                            <constraint firstAttribute="trailing" secondItem="Udb-42-vmg" secondAttribute="trailing" id="Kun-a0-TaY"/>
                             <constraint firstItem="tqw-yw-aMi" firstAttribute="leading" secondItem="5X4-CX-j08" secondAttribute="leading" id="LKU-RA-QCI"/>
                             <constraint firstItem="tqw-yw-aMi" firstAttribute="top" secondItem="yDd-Ka-vYu" secondAttribute="bottom" id="PC1-sv-Qcw"/>
+                            <constraint firstItem="kdP-F7-mqC" firstAttribute="leading" secondItem="5X4-CX-j08" secondAttribute="leading" constant="8" id="bjm-GH-j0c"/>
                             <constraint firstAttribute="trailing" secondItem="3cE-Zv-uOJ" secondAttribute="trailing" id="dEv-Vj-vsW"/>
                             <constraint firstItem="3cE-Zv-uOJ" firstAttribute="top" secondItem="yDd-Ka-vYu" secondAttribute="bottom" id="m1u-jP-11N"/>
+                            <constraint firstItem="kdP-F7-mqC" firstAttribute="top" secondItem="Udb-42-vmg" secondAttribute="bottom" constant="8" id="oTt-Ho-mxr"/>
+                            <constraint firstAttribute="trailing" secondItem="kdP-F7-mqC" secondAttribute="trailing" constant="8" id="q4l-cP-T8W"/>
+                            <constraint firstItem="Udb-42-vmg" firstAttribute="leading" secondItem="5X4-CX-j08" secondAttribute="leading" id="xPs-ss-MTj"/>
                             <constraint firstAttribute="trailing" secondItem="tqw-yw-aMi" secondAttribute="trailing" id="xRq-Jv-DtL"/>
                         </constraints>
                     </view>
@@ -248,7 +263,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="TYD-0r-FsB" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3506" y="358"/>
+            <point key="canvasLocation" x="3504.8000000000002" y="357.57121439280365"/>
         </scene>
         <!--Search Filters View Controller-->
         <scene sceneID="FKh-oo-djI">

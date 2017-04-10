@@ -7,9 +7,14 @@
 //
 
 import UIKit
+import MapKit
 
-class BusinessesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class BusinessesViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, MKMapViewDelegate {
     @IBOutlet weak var businessTableView: UITableView!
+    @IBOutlet weak var mapView: MKMapView!
+    
+    var mapButton: UIBarButtonItem!
+    var listButton: UIBarButtonItem!
     
     var businesses: [Business]!
     
@@ -36,6 +41,13 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
         filterButton.tintColor = UIColor.white
         navigationItem.leftBarButtonItem = filterButton
         
+        mapButton = UIBarButtonItem(title: "Map", style: .plain, target: self, action: #selector(mapClicked(sender:)))
+        listButton = UIBarButtonItem(title: "List", style: .plain, target: self, action: #selector(listClicked(sender:)))
+        
+        mapButton.tintColor = UIColor.white
+        listButton.tintColor = UIColor.white
+        navigationItem.rightBarButtonItem = mapButton
+        
         // Table View setup
         businessTableView.delegate = self
         businessTableView.dataSource = self
@@ -50,6 +62,12 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
         var insets = businessTableView.contentInset
         insets.bottom += InfiniteScrollActivityView.defaultHeight
         businessTableView.contentInset = insets
+        
+        // Map View
+        mapView.delegate = self
+        mapView.isHidden = true
+        let centerLocation = CLLocation(latitude: 37.7833, longitude: -122.4167)
+        goToLocation(location: centerLocation)
         
         Business.searchWithTerm(term: currentSearchText, completion: { (businesses: [Business]?, error: Error?) -> Void in
             
@@ -78,10 +96,16 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
         
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        loadMapWithData()
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    // MARK: - Table View methods
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
@@ -107,6 +131,43 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
     
     func filterClicked(sender: UIBarButtonItem) {
         performSegue(withIdentifier: "businessToFilter", sender: sender)
+    }
+    
+    func mapClicked(sender: UIBarButtonItem) {
+        navigationItem.rightBarButtonItem = listButton
+        mapView.isHidden = false
+        businessTableView.isHidden = true
+        loadMapWithData()
+    }
+    
+    func listClicked(sender: UIBarButtonItem) {
+        navigationItem.rightBarButtonItem = mapButton
+        mapView.isHidden = true
+        businessTableView.isHidden = false
+    }
+    
+    // MARK: - Map View methods
+    
+    func goToLocation(location: CLLocation) {
+        let span = MKCoordinateSpanMake(0.1, 0.1)
+        let region = MKCoordinateRegionMake(location.coordinate, span)
+        mapView.setRegion(region, animated: false)
+    }
+    
+    func addAnnotationAtCoordinate(coordinate: CLLocationCoordinate2D, withTitle title: String) {
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = coordinate
+        annotation.title = title
+        mapView.addAnnotation(annotation)
+    }
+    
+    func loadMapWithData() {
+        if self.businesses != nil {
+            for business in businesses {
+                let centerLocation = CLLocation(latitude: business.coordinate.lat!, longitude: business.coordinate.long!)
+                addAnnotationAtCoordinate(coordinate: centerLocation.coordinate, withTitle: business.name!)
+            }
+        }
     }
     
     // MARK: - Segue method override
@@ -136,6 +197,7 @@ extension BusinessesViewController: UISearchBarDelegate {
             (businesses: [Business]?, error: Error?) in
             self.businesses = businesses
             self.businessTableView.reloadData()
+            self.loadMapWithData()
         }
         
         searchBar.showsCancelButton = false
@@ -180,6 +242,7 @@ extension BusinessesViewController: UIScrollViewDelegate {
             self.isMoreDataLoading = false
             self.businesses.append(contentsOf: businesses as [Business]!)
             self.businessTableView.reloadData()
+            self.loadMapWithData()
         }
         
     }
@@ -215,6 +278,7 @@ extension BusinessesViewController: SearchFiltersViewControllerDelegate {
             (businesses: [Business]?, error: Error?) in
             self.businesses = businesses
             self.businessTableView.reloadData()
+            self.loadMapWithData()
         }
     }
     
