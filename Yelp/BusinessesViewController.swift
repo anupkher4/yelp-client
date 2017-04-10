@@ -32,7 +32,7 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
         searchBar.delegate = self
         navigationItem.titleView = searchBar
         
-        let filterButton = UIBarButtonItem(title: "Filter", style: .plain, target: self, action: nil)
+        let filterButton = UIBarButtonItem(title: "Filter", style: .plain, target: self, action: #selector(filterClicked(sender:)))
         filterButton.tintColor = UIColor.white
         navigationItem.leftBarButtonItem = filterButton
         
@@ -103,11 +103,25 @@ class BusinessesViewController: UIViewController, UITableViewDelegate, UITableVi
         return cell
     }
     
+    // MARK: - Button targets
+    
+    func filterClicked(sender: UIBarButtonItem) {
+        performSegue(withIdentifier: "businessToFilter", sender: sender)
+    }
+    
+    // MARK: - Segue method override
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "businessToDetail" {
             let destination = segue.destination as! BusinessDetailViewController
             let indexPath = businessTableView.indexPath(for: sender as! BusinessTableViewCell)
             destination.currentBusiness = businesses[indexPath!.row]
+        }
+        
+        if segue.identifier == "businessToFilter" {
+            let destinationNav = segue.destination as! UINavigationController
+            let destination = destinationNav.topViewController as! SearchFiltersViewController
+            destination.delegate = self
         }
     }
     
@@ -168,6 +182,40 @@ extension BusinessesViewController: UIScrollViewDelegate {
             self.businessTableView.reloadData()
         }
         
+    }
+    
+}
+
+extension BusinessesViewController: SearchFiltersViewControllerDelegate {
+    
+    func searchFiltersViewController(filtersViewController: SearchFiltersViewController, didUpdateSearchFilters filters: [String : Any]) {
+        currentSearchText = "Restaurants"
+        
+        var deals: Bool?
+        if filters["Deal"] != nil {
+            deals = filters["Deal"] as! Bool
+        }
+        
+        var sort: Int?
+        if filters["Sort"] != nil {
+            sort = filters["Sort"] as! Int
+        }
+        
+        var distance: Int?
+        if filters["Distance"] != nil {
+            distance = Int(filters["Distance"] as! Double)
+        }
+        
+        var selectedCategories: [String]?
+        if filters["Category"] != nil {
+            selectedCategories = filters["Category"] as! [String]
+        }
+        
+        Business.searchWithTerm(term: currentSearchText, sort: YelpSortMode(rawValue: sort!), categories: selectedCategories, deals: deals, radius: distance, offset: nil) {
+            (businesses: [Business]?, error: Error?) in
+            self.businesses = businesses
+            self.businessTableView.reloadData()
+        }
     }
     
 }
